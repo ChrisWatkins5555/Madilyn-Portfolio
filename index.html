@@ -22,6 +22,8 @@
     --nav-bg: rgba(255, 255, 255, 0.82);
     --orb-a: rgba(34, 51, 224, 0.15);
     --orb-b: rgba(34, 51, 224, 0.08);
+    --hex-line: rgba(34, 51, 224, 0.09);
+    --hex-glow: rgba(34, 51, 224, 1);
     --btn-text: #FFFFFF;
     --serif: 'Fraunces', Georgia, serif;
     --sans: 'Inter', -apple-system, sans-serif;
@@ -43,6 +45,8 @@
     --nav-bg: rgba(8, 9, 12, 0.78);
     --orb-a: rgba(58, 74, 240, 0.20);
     --orb-b: rgba(58, 74, 240, 0.10);
+    --hex-line: rgba(120, 134, 255, 0.14);
+    --hex-glow: rgba(90, 107, 255, 1);
     --btn-text: #08090C;
     color-scheme: dark;
   }
@@ -125,6 +129,42 @@
     width: 700px; height: 700px;
     bottom: -260px; left: -220px;
     background: radial-gradient(circle, var(--orb-b), transparent 66%);
+  }
+
+  /* ---- Honeycomb lattice ---- */
+  .honeycomb{
+    position: absolute;
+    inset: -90px;
+    color: var(--hex-line);
+    -webkit-mask-image: radial-gradient(ellipse 118% 82% at 50% 42%, transparent 20%, rgba(0,0,0,0.35) 54%, #000 90%);
+    mask-image: radial-gradient(ellipse 118% 82% at 50% 42%, transparent 20%, rgba(0,0,0,0.35) 54%, #000 90%);
+    animation: hexDrift 30s ease-in-out infinite alternate;
+  }
+
+  .honeycomb svg{ width: 100%; height: 100%; display: block; }
+  .honeycomb path{ fill: currentColor; }
+
+  .hex-cell{
+    position: absolute;
+    width: 150px; height: 132px;
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    background: radial-gradient(circle at 50% 45%, var(--hex-glow) 0%, transparent 70%);
+    opacity: 0;
+    animation: hexPulse 8s ease-in-out infinite;
+  }
+  .hc1{ top: 15%; right: 11%; animation-delay: 0s; }
+  .hc2{ top: 60%; left: 7%;  width: 195px; height: 170px; animation-delay: 2.6s; }
+  .hc3{ top: 33%; left: 21%; width: 110px; height: 96px;  animation-delay: 4.4s; }
+  .hc4{ bottom: 11%; right: 21%; width: 132px; height: 116px; animation-delay: 6s; }
+
+  @keyframes hexDrift{
+    from{ transform: translate3d(0, 0, 0) scale(1); }
+    to{   transform: translate3d(26px, -20px, 0) scale(1.05); }
+  }
+
+  @keyframes hexPulse{
+    0%, 100%{ opacity: 0; transform: scale(0.9); }
+    50%{ opacity: 0.18; transform: scale(1); }
   }
 
   /* ============ Nav ============ */
@@ -589,6 +629,8 @@
     .reveal{ opacity: 1; transform: none; filter: none; transition: none; }
     .rule{ width: 130px !important; transition: none; }
     .orb{ display: none; }
+    .honeycomb{ animation: none; }
+    .hex-cell{ display: none; }
     .btn:hover, .theme-toggle:hover{ transform: none; }
   }
 </style>
@@ -598,6 +640,20 @@
 <div class="backdrop" aria-hidden="true">
   <div class="orb orb-a" data-speed="0.10"></div>
   <div class="orb orb-b" data-speed="-0.06"></div>
+  <div class="honeycomb">
+    <svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <pattern id="hexPattern" width="28" height="49" patternUnits="userSpaceOnUse" patternTransform="scale(2)">
+          <path fill-rule="evenodd" d="M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v11.7l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.3zM15 0v7.5L27.99 15H28v-2.31h-.01L17 6.35V0h-2zm0 49v-8l12.99-7.5H28v2.31h-.01L17 42.15V49h-2z"/>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#hexPattern)"/>
+    </svg>
+  </div>
+  <span class="hex-cell hc1"></span>
+  <span class="hex-cell hc2"></span>
+  <span class="hex-cell hc3"></span>
+  <span class="hex-cell hc4"></span>
 </div>
 
 <nav class="nav" aria-label="Main">
