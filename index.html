@@ -85,6 +85,7 @@
     html{ scroll-snap-type: y proximity; }
     .snap{ scroll-snap-align: start; }
     .project{
+      min-height: 100vh; /* fallback for browsers without svh support */
       min-height: 100svh;
       display: flex;
       flex-direction: column;
@@ -235,12 +236,24 @@
     height: 26px;
     width: auto;
     display: block;
+    filter: drop-shadow(0 0 10px var(--glow)); /* fallback for browsers without color-mix support */
     filter: drop-shadow(0 0 10px color-mix(in srgb, var(--glow) 55%, transparent));
   }
 
   .wordmark .mark-night{ display: none; }
   html.dark .wordmark .mark-night{ display: block; }
   html.dark .wordmark .mark-day{ display: none; }
+
+  /* Scrolled state, ported from the main site: the wordmark collapses so it
+     never collides with content sliding beneath the transparent masthead.
+     The glass rail stays — its backdrop blur keeps it legible over anything. */
+  .wordmark{ transition: opacity 0.3s ease, visibility 0s 0s; }
+  .nav.scrolled .wordmark{
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.3s ease, visibility 0s 0.3s;
+  }
 
   /* The tab rail: a single frosted glass pill floating under the masthead,
      matching the main site's .nav-links exactly. */
@@ -271,6 +284,7 @@
 
   .nav-links a:hover{
     color: var(--accent);
+    background: var(--accent-soft); /* fallback for browsers without color-mix support */
     background: color-mix(in srgb, var(--accent) 8%, transparent);
   }
 
@@ -293,6 +307,7 @@
   .theme-toggle:hover{
     border-color: var(--accent);
     color: var(--accent);
+    box-shadow: 0 0 10px var(--glow); /* fallback for browsers without color-mix support */
     box-shadow: 0 0 10px color-mix(in srgb, var(--glow) 40%, transparent);
   }
 
@@ -302,9 +317,9 @@
     display: block;
   }
 
-  .icon-moon{ display: none; }
-  html.dark .icon-moon{ display: block; }
-  html.dark .icon-sun{ display: none; }
+  .theme-toggle .icon-moon{ display: none; }
+  html.dark .theme-toggle .icon-moon{ display: block; }
+  html.dark .theme-toggle .icon-sun{ display: none; }
 
   /* Fixed to the viewport's very top edge — the masthead has no bar of its
      own anymore for the progress line to underline. */
@@ -319,11 +334,14 @@
 
   /* ============ Hero ============ */
   .hero{
+    min-height: 100vh; /* fallback for browsers without svh support */
     min-height: 100svh;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 128px 0 72px;
+    /* Side padding restated: this element is also .wrap, and this shorthand
+       would otherwise zero out .wrap's 28px gutters. */
+    padding: 128px 28px 72px;
   }
 
   .eyebrow{
@@ -648,11 +666,13 @@
 
   /* ============ Footer ============ */
   .footer{
+    min-height: 88vh; /* fallback for browsers without svh support */
     min-height: 88svh;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 120px 0 56px;
+    /* Side padding restated — .footer is also .wrap (see .hero note). */
+    padding: 120px 28px 56px;
   }
 
   .footer .eyebrow{ margin-bottom: 24px; }
@@ -711,6 +731,13 @@
 
   /* ============ Responsive ============ */
   @media (max-width: 860px){
+    /* The two-row masthead is ~120px tall; a vertically-centred hero taller
+       than the remaining space slides up underneath it. Anchor to the top
+       instead, clear of the nav, and let the section grow. */
+    .hero{
+      justify-content: flex-start;
+      padding-top: 175px;
+    }
     .project-grid{
       grid-template-columns: 1fr;
       gap: 28px;
@@ -959,6 +986,7 @@
     var progress = document.getElementById('progress');
     var orbs = document.querySelectorAll('.orb');
     var honeycomb = document.querySelector('.honeycomb');
+    var nav = document.querySelector('.nav');
     var ticking = false;
 
     function onScroll(){
@@ -970,6 +998,7 @@
         var y = window.scrollY || doc.scrollTop;
 
         progress.style.width = (max > 0 ? (y / max) * 100 : 0) + '%';
+        nav.classList.toggle('scrolled', y > 40);
 
         if (!reduceMotion){
           orbs.forEach(function(orb){
