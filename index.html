@@ -824,13 +824,17 @@
     var root = document.documentElement;
     var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    /* Theme — respect system preference on load */
-    if (window.matchMedia('(prefers-color-scheme: dark)').matches){
+    /* Theme — always defaults to light (matches the main Glo-Web site),
+       ignoring system preference. Remembers the visitor's own choice. */
+    var savedTheme = null;
+    try { savedTheme = localStorage.getItem('glo-web-portfolio-theme'); } catch (e) { /* private mode */ }
+    if (savedTheme === 'dark'){
       root.classList.add('dark');
     }
 
     document.getElementById('themeToggle').addEventListener('click', function(){
       root.classList.toggle('dark');
+      try { localStorage.setItem('glo-web-portfolio-theme', root.classList.contains('dark') ? 'dark' : 'light'); } catch (e) { /* private mode */ }
     });
 
     /* Reveal on scroll */
